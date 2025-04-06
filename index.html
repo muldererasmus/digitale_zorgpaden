@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XPDL Activity Extractor (Links in zelfde tab)</title>
+    <title>Gesynchroniseerde Digitale Zorgpaden</title>
 
     <style>
-        /* Basisstijlen blijven hetzelfde */
+        /* Basisstijlen */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
             line-height: 1.6;
@@ -28,49 +28,69 @@
             padding-bottom: 5px;
             margin-bottom: 15px;
         }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        input[type="file"] {
-            display: block;
-            margin-bottom: 15px;
-            padding: 8px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            width: calc(100% - 18px);
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.2s ease-in-out;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #resultsListContainer {
-            margin-top: 25px;
-            padding: 20px;
-            background-color: #e9ecef;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            min-height: 50px;
-        }
-        #resultsList { list-style: disc; padding-left: 25px; margin: 0; }
-        #resultsList li { margin-bottom: 10px; color: #495057; }
-        #resultsList ul { list-style: circle; padding-left: 20px; margin-top: 5px; margin-bottom: 5px; }
-        #resultsList ul li { margin-bottom: 5px; font-size: 0.95em; color: #333; line-height: 1.4; }
-        #resultsList ul li.performer-item { color: #555; font-style: italic; margin-top: 8px; }
-        #resultsList ul li.location-item { color: #444; margin-top: 8px; }
+        /* Label is verwijderd, dus styling ervoor kan weg indien specifiek */
+        /* label { display: block; margin-bottom: 8px; font-weight: 500; } */
+        input[type="file"] { display: block; margin-bottom: 15px; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; width: calc(100% - 18px); }
+        /* Stijl voor de knop om het bestand te verwerken */
+        button#processButton { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; transition: background-color 0.2s ease-in-out; }
+        button#processButton:hover { background-color: #0056b3; }
+        #resultsListContainer { margin-top: 25px; padding: 20px; background-color: #e9ecef; border: 1px solid #ced4da; border-radius: 4px; min-height: 50px; }
         #statusMessage { margin-top: 15px; color: #6c757d; font-style: italic; font-size: 0.9em; }
         .input-group { margin-bottom: 20px; }
-        #resultsList li.collapsible { cursor: pointer; }
+
+        /* Lijst Stijlen */
+        #resultsList {
+             list-style: disc;
+             padding-left: 25px;
+             margin: 0;
+        }
+
+        /* Zone Styling */
+        .zone-group {
+            margin-bottom: 15px;
+            padding-left: 0;
+        }
+        .zone-header {
+            font-weight: bold;
+            font-size: 1.15em;
+            color: #0056b3;
+            margin-bottom: 5px;
+            display: block;
+            cursor: pointer;
+            padding: 4px 0;
+        }
+
+        /* Station Lijst Styling (binnen zone) */
+        .station-list {
+             list-style: disc;
+             padding-left: 30px;
+             margin: 0;
+        }
+
+        /* Station Item Styling */
+        #resultsList > .station-item,
+        .station-list > .station-item {
+             margin-bottom: 10px;
+             color: #495057;
+        }
+         #resultsList > .station-item:first-child {
+             margin-top: 10px;
+         }
+
+        .station-item.collapsible { cursor: pointer; }
+
+        /* Sub-bullet Styling (Details binnen station) */
+        .station-item > ul {
+             list-style: circle;
+             padding-left: 20px;
+             margin-top: 5px;
+             margin-bottom: 5px;
+        }
+        .station-item > ul > li { margin-bottom: 5px; font-size: 0.95em; color: #333; line-height: 1.4; }
+        .station-item > ul > li.performer-item { color: #555; font-style: italic; margin-top: 8px; }
+        .station-item > ul > li.location-item { color: #444; margin-top: 8px; }
+
+        /* Hulp classes */
         .hidden { display: none; }
         .embedded-video-iframe { width: 100%; max-width: 560px; aspect-ratio: 16 / 9; border: none; margin-top: 5px; margin-bottom: 5px; }
         .embedded-video-html5 { width: 100%; max-width: 560px; height: auto; display: block; margin-top: 5px; margin-bottom: 5px; }
@@ -79,20 +99,18 @@
 <body>
 
     <div class="container">
-        <h1>XPDL Activity Extractor</h1>
-        <p>Selecteer een XPDL-bestand (XML). De tool zoekt naar Activiteiten die verband houden met "Station". Het toont de Activiteit naam, beschrijvingen, Performer(s), en Lokatie. Klik op Activiteitennamen om details te zien. Videolinks worden ingebed, andere links openen in hetzelfde venster (vanwege sandbox-beperkingen).</p>
+        <h1>Gesynchroniseerde Digitale Zorgpaden</h1>
+        <p>Selecteer een zorgpad om weer te geven</p>
 
         <div class="input-group">
-            <label for="xmlFile">Kies XPDL/XML bestand:</label>
             <input type="file" id="xmlFile" accept=".xml,.xpdl,text/xml">
         </div>
 
         <button id="processButton">Verwerk XPDL Bestand</button>
 
         <div id="resultsListContainer">
-             <h2>Resultaten (Klik om uit/in te klappen):</h2>
-             <ul id="resultsList"></ul>
-             <p id="statusMessage"></p>
+             <h2>Actuele Digitale Zorgpad</h2>
+             <ul id="resultsList"></ul> <p id="statusMessage"></p>
         </div>
     </div>
 
@@ -119,173 +137,185 @@
         }
 
         function processXML(xmlString) {
-            // (XML Parsing, Foutcontrole, Namespace, XPath, Dataverzameling - hetzelfde als voorheen)
+            // (XML Parsing, Foutcontrole, Namespace, Ophalen Activities, Dataverzameling - alles hetzelfde als voorheen)
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(xmlString, "application/xml");
-            if (xmlDoc.documentElement.nodeName === "parsererror") { /* ... foutafhandeling ... */ statusMessage.textContent = `❌ Fout bij parsen XML...`; resultsList.innerHTML = ''; return; }
+            resultsList.innerHTML = '';
+            if (xmlDoc.documentElement.nodeName === "parsererror") { /* ... */ statusMessage.textContent = `❌ Fout bij parsen XML...`; return; }
             const parseErrorElements = xmlDoc.getElementsByTagName("parsererror");
-            if (parseErrorElements.length > 0) { /* ... foutafhandeling ... */ statusMessage.textContent = `❌ Fout bij parsen XML...`; resultsList.innerHTML = ''; return; }
+            if (parseErrorElements.length > 0) { /* ... */ statusMessage.textContent = `❌ Fout bij parsen XML...`; return; }
             const xpdlNamespace = "http://www.wfmc.org/2004/XPDL2.0alpha";
             function nsResolver(prefix) { return prefix === 'xpdl' ? xpdlNamespace : null; }
-            const stationXPath = "//xpdl:ExtendedAttribute[@Value[contains(., 'Station')]]";
-            let stationAttributeNodes;
-            try { stationAttributeNodes = xmlDoc.evaluate(stationXPath, xmlDoc, nsResolver, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null); }
-            catch (xpathError) { /* ... foutafhandeling ... */ statusMessage.textContent = `❌ Fout bij uitvoeren XPath query...`; resultsList.innerHTML = ''; return; }
-            const activityData = new Map();
-            for (let i = 0; i < stationAttributeNodes.snapshotLength; i++) { /* ... dataverzamelingslogica met performer en locatie ... */
-                 const stationNode = stationAttributeNodes.snapshotItem(i);
-                const extendedAttributesNode = stationNode.parentNode;
-                if (!extendedAttributesNode || extendedAttributesNode.nodeName !== 'ExtendedAttributes') continue;
-                const activityNode = extendedAttributesNode.parentNode;
-                 if (!activityNode || activityNode.nodeType !== Node.ELEMENT_NODE) continue;
+            const allActivitiesXPath = "//xpdl:WorkflowProcess[1]/xpdl:Activities/xpdl:Activity";
+            let allActivityNodesSnapshot;
+            try { allActivityNodesSnapshot = xmlDoc.evaluate(allActivitiesXPath, xmlDoc, nsResolver, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null); }
+            catch (xpathError) { console.error("Fout bij ophalen activiteiten:", xpathError); statusMessage.textContent = `❌ Kon activiteiten niet vinden in XML.`; return; }
+            const groupedResults = [];
+            let currentZoneName = null;
+            let currentZoneGroup = null;
+            for (let i = 0; i < allActivityNodesSnapshot.snapshotLength; i++) {
+                const activityNode = allActivityNodesSnapshot.snapshotItem(i);
+                if (activityNode.nodeType !== Node.ELEMENT_NODE) continue;
                 const activityName = activityNode.getAttribute('Name');
                 if (!activityName) continue;
-                const performerNames = [];
-                try { /* ... performer lookup ... */
-                    const performerXPath = "xpdl:Performers/xpdl:Performer";
-                    const performerNodesSnapshot = xmlDoc.evaluate(performerXPath, activityNode, nsResolver, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-                    for (let j = 0; j < performerNodesSnapshot.snapshotLength; j++) {
-                        const performerNode = performerNodesSnapshot.snapshotItem(j);
-                        if (performerNode && performerNode.textContent) {
-                            const participantId = performerNode.textContent.trim();
-                            if (participantId) {
-                                const participantXPath = `//xpdl:Participant[@Id='${participantId}']`;
-                                const participantNode = xmlDoc.evaluate(participantXPath, xmlDoc, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-                                if (participantNode) { const name = participantNode.getAttribute('Name'); if (name) { performerNames.push(name); } }
-                            }
-                        }
-                    }
-                } catch(perfError) { console.error("Fout bij zoeken naar performer(s):", activityName, perfError); }
-                let htmlDescriptionValue = null;
-                let locationText = null;
-                for (const sibling of extendedAttributesNode.children) { /* ... description and location lookup ... */
-                    if (sibling.nodeName === 'ExtendedAttribute') {
-                        const attrName = sibling.getAttribute('Name');
-                        const attrValue = sibling.getAttribute('Value');
-                        if (attrName === 'HTMLDescription' && typeof attrValue === 'string') { htmlDescriptionValue = attrValue; }
-                        else if (attrName === '1029' && typeof attrValue === 'string') {
-                            const tildeIndex = attrValue.indexOf('~');
-                            locationText = (tildeIndex !== -1) ? attrValue.substring(0, tildeIndex).trim() : attrValue.trim();
-                        }
+                let isZoneStart = false; let isStation = false;
+                if (activityName.startsWith('Begin van ')) { /* ... Zone Start detectie ... */
+                    const zoneAttrXPath = "xpdl:ExtendedAttributes/xpdl:ExtendedAttribute[@Value[contains(., 'Zone')]]";
+                    const zoneAttrNode = xmlDoc.evaluate(zoneAttrXPath, activityNode, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                    if (zoneAttrNode) {
+                        isZoneStart = true;
+                        currentZoneName = activityName.substring('Begin van '.length).trim();
+                        currentZoneGroup = { zoneName: currentZoneName, stations: [] };
+                        groupedResults.push(currentZoneGroup);
                     }
                 }
-                if (!activityData.has(activityName)) { activityData.set(activityName, { descriptions: [], performers: performerNames, location: locationText }); }
-                if (htmlDescriptionValue !== null) { const d = activityData.get(activityName); if(d) d.descriptions.push(htmlDescriptionValue); }
-            }
+                const stationAttrXPath = "xpdl:ExtendedAttributes/xpdl:ExtendedAttribute[@Value[contains(., 'Station')]]";
+                const stationAttrNode = xmlDoc.evaluate(stationAttrXPath, activityNode, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                if (stationAttrNode) { isStation = true; }
+                if (isStation) { /* ... Details verzamelen (Performers, Desc, Loc) ... */
+                    const performerNames = []; try { /* ... performer lookup ... */
+                        const performerXPath = "xpdl:Performers/xpdl:Performer";
+                        const performerNodesSnapshot = xmlDoc.evaluate(performerXPath, activityNode, nsResolver, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                        for (let j = 0; j < performerNodesSnapshot.snapshotLength; j++) {
+                            const performerNode = performerNodesSnapshot.snapshotItem(j);
+                            if (performerNode && performerNode.textContent) {
+                                const participantId = performerNode.textContent.trim();
+                                if (participantId) {
+                                    const participantXPath = `//xpdl:Participant[@Id='${participantId}']`;
+                                    const participantNode = xmlDoc.evaluate(participantXPath, xmlDoc, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                                    if (participantNode) { const name = participantNode.getAttribute('Name'); if (name) { performerNames.push(name); } }
+                                }
+                            }
+                        } } catch(perfError){ console.error("...",perfError); }
+                    let locationText = null; const descriptionsSet = new Set();
+                    const extAttrXPath = "xpdl:ExtendedAttributes/xpdl:ExtendedAttribute";
+                    const extAttrNodes = xmlDoc.evaluate(extAttrXPath, activityNode, nsResolver, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                    for(let k=0; k < extAttrNodes.snapshotLength; k++){ /* ... description/location lookup ... */
+                        const sibling = extAttrNodes.snapshotItem(k);
+                        if (sibling.nodeName === 'ExtendedAttribute') {
+                            const attrName = sibling.getAttribute('Name'); const attrValue = sibling.getAttribute('Value');
+                            if (attrName === 'HTMLDescription' && typeof attrValue === 'string') { descriptionsSet.add(attrValue); }
+                            else if (attrName === '1029' && typeof attrValue === 'string') { const tildeIndex = attrValue.indexOf('~'); locationText = (tildeIndex !== -1) ? attrValue.substring(0, tildeIndex).trim() : attrValue.trim(); }
+                        } }
+                    const uniqueDescriptions = Array.from(descriptionsSet);
+                    const stationData = { activityName: activityName, descriptions: uniqueDescriptions, performers: performerNames, location: locationText };
+                    if (currentZoneGroup) { currentZoneGroup.stations.push(stationData); }
+                    else { let g = groupedResults.find(grp => grp.zoneName === null); if (!g) { g = { zoneName: null, stations: [] }; groupedResults.push(g); } g.stations.push(stationData); }
+                }
+            } // Einde loop allActivityNodesSnapshot
 
 
-            // --- Resultaten Weergeven (met Lokatie) ---
-            resultsList.innerHTML = '';
-            if (activityData.size > 0) {
-                activityData.forEach((activityInfo, activityName) => {
-                    const mainLi = document.createElement('li');
-                    mainLi.textContent = activityName;
-                    const uniqueDescriptions = new Set(activityInfo.descriptions);
-                    const performersExist = activityInfo.performers && activityInfo.performers.length > 0;
-                    const descriptionsExist = uniqueDescriptions.size > 0;
-                    const locationExists = activityInfo.location !== null && activityInfo.location.trim() !== '';
-
-                    if (performersExist || descriptionsExist || locationExists) {
-                        mainLi.classList.add('collapsible');
-                        const nestedUl = document.createElement('ul');
-                        nestedUl.classList.add('hidden');
-
-                        // EERST: Voeg beschrijvingen toe (verwerkt video's, links zijn nu normaal)
-                        if (descriptionsExist) {
-                            uniqueDescriptions.forEach(desc => {
-                                const nestedLi = document.createElement('li');
-                                processAndAppendContent(nestedLi, desc); // Handelt nu video's af, laat links met rust
-                                nestedUl.appendChild(nestedLi);
+            // --- Resultaten Weergeven (HTML generatie logica blijft hetzelfde) ---
+            if (groupedResults.length > 0) {
+                groupedResults.forEach(group => {
+                    if (group.zoneName === null) {
+                        // --- Stations ZONDER Zone ---
+                        if (group.stations.length > 0) {
+                            group.stations.forEach(stationData => {
+                                const stationLi = createStationListItem(stationData);
+                                resultsList.appendChild(stationLi);
                             });
                         }
-
-                         // DAARNA: Voeg performer(s) toe
-                        if (performersExist) {
-                            const performerLi = document.createElement('li');
-                            performerLi.classList.add('performer-item');
-                            performerLi.textContent = `Uitvoerder(s): ${activityInfo.performers.join(', ')}`;
-                            nestedUl.appendChild(performerLi);
+                    } else {
+                        // --- Stations MET Zone ---
+                        const zoneLi = document.createElement('li');
+                        zoneLi.classList.add('zone-group');
+                        const header = document.createElement('span');
+                        header.classList.add('zone-header', 'collapsible');
+                        header.textContent = group.zoneName;
+                        zoneLi.appendChild(header);
+                        const stationUl = document.createElement('ul');
+                        stationUl.classList.add('station-list', 'hidden');
+                        if (group.stations.length > 0) {
+                            group.stations.forEach(stationData => {
+                                const stationLi = createStationListItem(stationData);
+                                stationUl.appendChild(stationLi);
+                            });
+                        } else {
+                            const noStationsLi = document.createElement('li');
+                            noStationsLi.textContent = "(Geen stations gevonden in deze zone)";
+                            noStationsLi.style.fontStyle = 'italic'; noStationsLi.style.color = '#888';
+                            stationUl.appendChild(noStationsLi);
                         }
-
-                        // LAATST: Voeg locatie toe
-                        if (locationExists) {
-                            const locationLi = document.createElement('li');
-                            locationLi.classList.add('location-item');
-                            locationLi.textContent = `Lokatie: ${activityInfo.location}`;
-                            nestedUl.appendChild(locationLi);
-                        }
-
-                        mainLi.appendChild(nestedUl);
+                        zoneLi.appendChild(stationUl);
+                        resultsList.appendChild(zoneLi);
                     }
-                    resultsList.appendChild(mainLi);
                 });
-                statusMessage.textContent = `✅ ${activityData.size} unieke Activiteiten gevonden gerelateerd aan 'Station'. Klik op namen om details te zien.`;
+                statusMessage.textContent = `✅ Resultaten gegroepeerd per zone. Klik op zone/station namen om details te zien.`;
             } else {
                 statusMessage.textContent = 'ℹ️ Geen ExtendedAttributes gevonden die "Station" bevatten binnen een Activity element.';
             }
         }
 
-        // --- Helper functie om beschrijving te verwerken (ZONDER target="_blank") ---
+        // --- Helper functie om een Station LI te maken (blijft hetzelfde) ---
+        function createStationListItem(stationData) {
+            const mainLi = document.createElement('li');
+            mainLi.classList.add('station-item');
+            mainLi.textContent = stationData.activityName;
+            const performersExist = stationData.performers && stationData.performers.length > 0;
+            const descriptionsExist = stationData.descriptions && stationData.descriptions.length > 0;
+            const locationExists = stationData.location !== null && stationData.location.trim() !== '';
+            if (performersExist || descriptionsExist || locationExists) {
+                mainLi.classList.add('collapsible');
+                const nestedUl = document.createElement('ul');
+                nestedUl.classList.add('hidden');
+                if (descriptionsExist) { /* ... add descriptions ... */
+                    stationData.descriptions.forEach(desc => { const li = document.createElement('li'); processAndAppendContent(li, desc); nestedUl.appendChild(li); });
+                 }
+                if (performersExist) { /* ... add performers ... */
+                    const li = document.createElement('li'); li.classList.add('performer-item'); li.textContent = `Uitvoerder(s): ${stationData.performers.join(', ')}`; nestedUl.appendChild(li);
+                 }
+                if (locationExists) { /* ... add location ... */
+                    const li = document.createElement('li'); li.classList.add('location-item'); li.textContent = `Lokatie: ${stationData.location}`; nestedUl.appendChild(li);
+                 }
+                mainLi.appendChild(nestedUl);
+            }
+            return mainLi;
+        }
+
+
+        // --- Helper functie om beschrijving te verwerken (blijft hetzelfde) ---
         function processAndAppendContent(listItem, descriptionHtml) {
              const tempDiv = document.createElement('div');
-             tempDiv.innerHTML = descriptionHtml; // Parseer HTML
-             const initialLinks = tempDiv.querySelectorAll('a'); // Vind alle links initieel
-
-             // Loop 1: Vervang video links door embeds
-             initialLinks.forEach(link => {
+             tempDiv.innerHTML = descriptionHtml;
+             const initialLinks = tempDiv.querySelectorAll('a');
+             initialLinks.forEach(link => { /* ... video embed logic ... */
                  const url = link.getAttribute('href');
                  if (!url) return;
-
                  let replacementElement = null;
-                 // Check alleen voor video
                  const youtubeId = getYouTubeId(url);
                  const vimeoId = getVimeoId(url);
                  const isDirectVideo = /\.(mp4|webm|ogg)$/i.test(url);
-
                  if (youtubeId) replacementElement = createYouTubeEmbed(youtubeId);
                  else if (vimeoId) replacementElement = createVimeoEmbed(vimeoId);
                  else if (isDirectVideo) replacementElement = createVideoElement(url);
-
-                 // Vervang de link door het video embed-element (indien gemaakt)
-                 if (replacementElement && link.parentNode) {
-                      link.parentNode.replaceChild(replacementElement, link);
-                 }
-                 // GEEN else block meer om target in te stellen
+                 if (replacementElement && link.parentNode) { link.parentNode.replaceChild(replacementElement, link); }
              });
-
-             // Loop 2 (instellen target="_blank") is VERWIJDERD
-             // Debug logs zijn ook verwijderd
-
-             // Voeg de (mogelijk aangepaste) inhoud toe aan het list item
-             while (tempDiv.firstChild) {
-                 listItem.appendChild(tempDiv.firstChild);
-             }
+             while (tempDiv.firstChild) { listItem.appendChild(tempDiv.firstChild); }
         }
 
-        // --- Toggle Handler (checkt nog steeds voor link-klik) ---
+        // --- Toggle Handler (blijft hetzelfde) ---
         function handleToggle(event) {
-             // Check of de klik op een link was
-             if (event.target.closest('a')) {
-                 // Doe niets als er op een link is geklikt (laat de link openen in hetzelfde venster)
+             if (event.target.closest('a')) { return; }
+             const zoneHeader = event.target.closest('.zone-header.collapsible');
+             if (zoneHeader) {
+                 const stationList = zoneHeader.nextElementSibling;
+                 if (stationList && stationList.classList.contains('station-list')) {
+                     stationList.classList.toggle('hidden');
+                 }
                  return;
              }
-
-             // Zoek het dichtstbijzijnde bovenliggende LI element dat inklapbaar is
-             const mainLi = event.target.closest('li.collapsible');
-
-             // Als de klik op of binnen een inklapbaar LI was (en niet op een link)
-             if (mainLi) {
-                 // Zoek de direct geneste UL binnen deze LI
-                 const nestedUl = mainLi.querySelector(':scope > ul');
-
-                 // Als er een geneste UL bestaat, toggle de 'hidden' class
-                 if (nestedUl) {
-                     nestedUl.classList.toggle('hidden');
+             const stationItem = event.target.closest('li.station-item.collapsible');
+             if (stationItem) {
+                 const detailsUl = stationItem.querySelector(':scope > ul');
+                 if (detailsUl) {
+                     detailsUl.classList.toggle('hidden');
                  }
+                 return;
              }
         }
 
-        // --- Video Helper Functies (hetzelfde als voorheen) ---
+        // --- Video Helper Functies (blijven hetzelfde) ---
         function getYouTubeId(url) { /* ... */
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = url.match(regExp);
@@ -327,4 +357,3 @@
 
 </body>
 </html>
-
