@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XPDL Activity Extractor (Link Fix)</title>
+    <title>XPDL Activity Extractor (Links in zelfde tab)</title>
 
     <style>
         /* Basisstijlen blijven hetzelfde */
@@ -80,7 +80,7 @@
 
     <div class="container">
         <h1>XPDL Activity Extractor</h1>
-        <p>Selecteer een XPDL-bestand (XML). De tool zoekt naar Activiteiten die verband houden met "Station". Het toont de Activiteit naam, beschrijvingen, Performer(s), en Lokatie. Klik op Activiteitennamen om details te zien. Videolinks worden ingebed, andere links openen in een nieuw tabblad.</p>
+        <p>Selecteer een XPDL-bestand (XML). De tool zoekt naar Activiteiten die verband houden met "Station". Het toont de Activiteit naam, beschrijvingen, Performer(s), en Lokatie. Klik op Activiteitennamen om details te zien. Videolinks worden ingebed, andere links openen in hetzelfde venster (vanwege sandbox-beperkingen).</p>
 
         <div class="input-group">
             <label for="xmlFile">Kies XPDL/XML bestand:</label>
@@ -190,11 +190,11 @@
                         const nestedUl = document.createElement('ul');
                         nestedUl.classList.add('hidden');
 
-                        // EERST: Voeg beschrijvingen toe (verwerkt video's, past links aan)
+                        // EERST: Voeg beschrijvingen toe (verwerkt video's, links zijn nu normaal)
                         if (descriptionsExist) {
                             uniqueDescriptions.forEach(desc => {
                                 const nestedLi = document.createElement('li');
-                                processAndAppendContent(nestedLi, desc); // Deze functie handelt nu video/links af
+                                processAndAppendContent(nestedLi, desc); // Handelt nu video's af, laat links met rust
                                 nestedUl.appendChild(nestedLi);
                             });
                         }
@@ -225,7 +225,7 @@
             }
         }
 
-        // --- Helper functie om beschrijving te verwerken (AANGEPAST voor target="_blank") ---
+        // --- Helper functie om beschrijving te verwerken (ZONDER target="_blank") ---
         function processAndAppendContent(listItem, descriptionHtml) {
              const tempDiv = document.createElement('div');
              tempDiv.innerHTML = descriptionHtml; // Parseer HTML
@@ -250,16 +250,11 @@
                  if (replacementElement && link.parentNode) {
                       link.parentNode.replaceChild(replacementElement, link);
                  }
+                 // GEEN else block meer om target in te stellen
              });
 
-             // --- NIEUW: Loop 2: Pas resterende links aan ---
-             const remainingLinks = tempDiv.querySelectorAll('a'); // Vind links opnieuw na mogelijke vervangingen
-             remainingLinks.forEach(link => {
-                 link.target = '_blank'; // Open in nieuw tabblad
-                 link.rel = 'noopener noreferrer'; // Veiligheid
-             });
-             // --- Einde NIEUW ---
-
+             // Loop 2 (instellen target="_blank") is VERWIJDERD
+             // Debug logs zijn ook verwijderd
 
              // Voeg de (mogelijk aangepaste) inhoud toe aan het list item
              while (tempDiv.firstChild) {
@@ -267,15 +262,13 @@
              }
         }
 
-        // --- Toggle Handler (AANGEPAST om link-klik te negeren) ---
+        // --- Toggle Handler (checkt nog steeds voor link-klik) ---
         function handleToggle(event) {
-             // --- NIEUW: Check of de klik op een link was ---
-             // Gebruik closest('a') om te zien of het doel of een ouder een link is
+             // Check of de klik op een link was
              if (event.target.closest('a')) {
-                 // Doe niets als er op een link is geklikt (laat de link openen)
+                 // Doe niets als er op een link is geklikt (laat de link openen in hetzelfde venster)
                  return;
              }
-             // --- Einde NIEUW ---
 
              // Zoek het dichtstbijzijnde bovenliggende LI element dat inklapbaar is
              const mainLi = event.target.closest('li.collapsible');
